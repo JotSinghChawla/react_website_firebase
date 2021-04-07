@@ -22,7 +22,7 @@ const HomeComponent = ({ dish, promotion, leader, dishesErrMess, dishesLoading, 
                 <FadeTransform in transformProps={{
                     exitTransform: 'scale(0.5) translateY(-50%) '}} >
                     <Card >
-                        <CardImg src={baseURL + item.image} alt={item.name} />
+                        <CardImg src={item.image} alt={item.name} />
                         <CardBody>
                             <CardTitle> {item.name} </CardTitle>
                             { item.designation ? <CardSubtitle> {item.designation} </CardSubtitle> : null }

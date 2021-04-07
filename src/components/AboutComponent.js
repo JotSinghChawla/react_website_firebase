@@ -11,7 +11,7 @@ const AboutComponent = ({ leaders }) => {
             <Fade in>
                 <Media key={input._id} className='mt-4'>
                     <Media left middle>
-                        <Media object className='mr-5' src={baseURL + input.image} alt={input.name} />
+                        <Media object className='mr-5' src={input.image} alt={input.name} />
                     </Media>
                     <Media body>
                         <Media heading>
