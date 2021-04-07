@@ -8,7 +8,7 @@ function RenderMenuItem({ dish, deleteFavourite }) {
     return (
         <Media tag='li'>
             <Media left middle>
-                <Media object src={ baseURL + dish.image } alt={dish.name} />
+                <Media object src={ dish.image } alt={dish.name} />
             </Media>
             <Media body className='ml-5'>
                 <Media heading> {dish.name} </Media>
@@ -21,7 +21,7 @@ function RenderMenuItem({ dish, deleteFavourite }) {
     )
 }
 
-const FavoriteComponent = ({ fav, deleteFav }) => {
+const FavoriteComponent = ({ fav, sentDishes, deleteFav }) => {
     if( fav.isLoading ) {
         return (
             <div className="container">
@@ -42,7 +42,9 @@ const FavoriteComponent = ({ fav, deleteFav }) => {
     }
     else if( fav.favorites ) {
         console.log('yes', fav);
-        const getFavorites = fav.favorites.dishes.map( dish => {                     // Must add fav.favorites[0]
+        const getFavorites = fav.favorites.dishes.map( dishId => {                     // Try adding fav.favorites[0]
+            
+            let dish = sentDishes.dishes.filter( dish => dish._id === dishId )[0];
             return (
                 <div key={ dish._id } className='col-12 mt-5'>
                     <RenderMenuItem dish={dish} deleteFavourite={ deleteFav } />
@@ -60,7 +62,8 @@ const FavoriteComponent = ({ fav, deleteFav }) => {
                         <BreadcrumbItem active> My Favorites </BreadcrumbItem>
                     </Breadcrumb>
                     <div className='col-12'>
-                        <h2> My Favorite Dishes</h2>
+                        <h2 className='d-inline'> My Favorite Dishes </h2>
+                        <p className='float-right'> {fav.favorites.user} </p>
                         <hr />
                     </div>
                 </div>

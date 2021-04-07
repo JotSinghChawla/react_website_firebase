@@ -42,7 +42,7 @@ const mapDispatchToProps = (dispatch) => ({
 class Main extends Component {
   
   componentDidMount() {
-    // this.props.checkUser()
+    this.props.checkUser()
     this.props.fetchFavorites()
     this.props.fetchDishes()      // this function is called
     this.props.fetchPromos()  
@@ -68,11 +68,11 @@ class Main extends Component {
     const DishWithId = ({ match }) => {
       return (
          this.props.auth.isAuthenticated  ? 
-            <DishdetailComponent sentDish={ this.props.dishes.dishes.filter( check => check._id === (match.params.dishId) )}
+            <DishdetailComponent sentDish={ this.props.dishes.dishes.filter( dish => dish._id === (match.params.dishId) )}
               isLoading={ this.props.dishes.isLoading }
               errMess={this.props.dishes.errorMessage } 
               postComment={ this.props.postComment } 
-              favorites={ this.props.favorites.favorites.dishes.filter((dish) => dish._id === match.params.dishId)}
+              favorites={ this.props.favorites.favorites.dishes.filter( check => check === match.params.dishId)}
               postFavorites={this.props.postFavorites}
             />
           :
@@ -123,7 +123,7 @@ class Main extends Component {
               <Route exact path='/menu' component={ () => <Menu sentDishes={this.props.dishes} /> } />
               <Route exact path='/menu/:dishId' component={ DishWithId } />
               <Route exact path='/contactus' component={ () => <Contact postFeedback={this.props.postFeedback} resetFeedbackForm={this.props.resetFeedbackForm} /> } />
-              <PrivateRoute exact path='/favorites' component={ () => <Favorites fav={this.props.favorites} deleteFav={this.props.deleteFavorites} /> } />
+              <PrivateRoute exact path='/favorites' component={ () => <Favorites fav={this.props.favorites} sentDishes={this.props.dishes} deleteFav={this.props.deleteFavorites} /> } />
               <Redirect to='/home' />
             </Switch>
           </CSSTransition>

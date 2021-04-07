@@ -18,19 +18,13 @@ export const Auth = ( state={
             return { ...state, isLoading: false, isAuthenticated: true, user: action.payload, errMessage: '' }
             
         case ActionTypes.LOGIN_FAILURE:
-            return { ...state, isLoading: false, isAuthenticated: false, errMessage: action.message }
+            return { ...state, isLoading: false, isAuthenticated: false,user: null, errMessage: action.message }
             
         case ActionTypes.LOGOUT_REQUEST:
             return { ...state, isLoading: true, isAuthenticated: true }
             
         case ActionTypes.LOGOUT_SUCCESS:
             return { ...state, isLoading: false, isAuthenticated: false, user: null }
-            
-        // case ActionTypes.CHECKING_USER:
-        //     return { ...state, isLoading: true, isAuthenticated: false, user: null }
-
-        // case ActionTypes.USER_CHECKED:
-        //     return { ...state, isLoading: false, isAuthenticated: true, user: action.payload }
         default:
             return state;
     }
