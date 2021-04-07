@@ -1,0 +1,1 @@
+export const logoURL = 'https://firebasestorage.googleapis.com/v0/b/confusion-server-49ed9.appspot.com/o/images%2Flogo.png?alt=media&token=2f5f51b0-16c0-4c7c-9b9f-33c161431d3f';
