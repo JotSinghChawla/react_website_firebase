@@ -34,80 +34,53 @@ export const fetchDishes = () => (dispatch) => {
         .catch( error => dispatch( dishesFailed(error.message) ) );
 }
 
-// export const addComment = ( comment ) => ({              // No need it as comment will be added through Dish
-//     type: ActionTypes.ADD_COMMENT,
-//     payload: comment
-// })
-
-// export const addComments = (comments) => ({
-//     type: ActionTypes.ADD_COMMENTS,
-//     payload: comments
-// })
-
 export const commentsFailed = (errorMessage) => ({
     type: ActionTypes.COMMENTS_FAILED,
-    payload: errorMessage
+    message: errorMessage
 })
 
-
-// export const fetchComments = () => (dispatch) => {
-//     return fetch( baseURL + 'comments' )
-//         .then( response => {
-//             if( response.ok ) {
-//                 return response
-//             }
-//             else {
-//                 var error = new Error( 'Error '+ response.status + ': ' + response.statusText )
-//                 error.response = response
-//                 throw error
-//             }
-//         }, error => {
-//             var errMess = new Error( error.message )
-//             throw errMess
-//         })
-//         .then( response => response.json() )
-//         .then( comments => dispatch( addComments(comments) ))
-//         .catch( error => { dispatch( commentsFailed( error.message  ) ) } )
-// }
+export const postingComments = () => ({
+    type: ActionTypes.POSTING_COMMENTS
+})
 
 export const postComment = ( dishId, rating, comment ) => (dispatch) => {
+   
+    if( !auth.currentUser ) {
+        console.log( 'No User logged in! \n Can\'t post Comments');
+        alert('No User logged in! \n Can\'t post Comments')
+        return;
+    }
+    var currentUser = auth.currentUser;
+
+    dispatch( favoritesLoading(true) );
+
+    
     const newComment = {
         comment: comment,
-        rating: rating
+        rating: parseInt(rating),
+        // updatedAt: firebasestore.FieldValue.serverTimestamp(),        // It can only be used inside add() or update() or set()
+        user: {
+            displayName: currentUser.displayName,
+            email: currentUser.email,
+            user_id: currentUser.uid,
+        }
     }
-    console.log(newComment, dishId, rating, comment)
-
-    const bearer = 'Bearer ' + localStorage.getItem('jwttoken');
-
-    fetch( baseURL + 'dishes/'+ dishId + '/comments', {
-        method: 'POST',
-        body: JSON.stringify( newComment ),
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': bearer
-        },
-        credentials: 'same-origin'
-    })
-    .then( response => {
-        if( response.ok ) {
-            return response
-        }
-        else {
-            var error = new Error( 'Error ' + response.status + ': ' + response.statusText )
-            error.response = response
-            throw error
-        }
-    }, error => {
-    //    var errMess = new Error( error.message )
-    //    throw errMess 
-        throw error
-    })
-    .then( response => response.json() )
-    .catch( error => { 
-        console.log( 'POST COMMENTS: ', error.message )
-        alert( 'Your comment is not posted\nError: ',error.message )
-    });
-    dispatch( fetchDishes() );
+    console.log(newComment)
+    
+    return firestore.collection('dishes').doc( dishId ).update({
+        comments: firebasestore.FieldValue.arrayUnion({ updatedAt: firebasestore.Timestamp.now(), ...newComment })
+        })
+        .then((docRef) => {
+            console.log("Document written with DATA: ", docRef);
+            // console.log("Document written with ID: ", docRef.id);
+        })
+        .then( () => {
+            dispatch( fetchDishes() );
+        })
+        .catch( error => { 
+            console.log( 'POST COMMENTS: ', error.message )
+            alert( 'Your comment is not posted\nError: ',error.message )
+        });
 }
 
 export const addPromos = (promos) => ({
@@ -221,7 +194,7 @@ export const fetchFavorites = () => dispatch => {
 
     return firestore.collection('favorites').where( 'user', '==', user.uid ).get()
         .then( querySnapshot => {
-            let favorites = { user: user, dishes: [] };
+            let favorites = { user: user.email, dishes: [] };
             querySnapshot.forEach( doc => {
                 const data = doc.data();
                 favorites.dishes.push( data.dish );
@@ -333,55 +306,18 @@ export const logoutUser = () => (dispatch) => {
     .catch( error => dispatch( loginError( error.message ) ) );
 };
 
-export const checkingUser = () => ({
-    type: ActionTypes.CHECKING_USER
-});
-
-export const userChecked = user => ({
-    type: ActionTypes.USER_CHECKED,
-    payload: user.username
-});
-
 export const checkUser = () => (dispatch) => {
-    dispatch( checkingUser() );
-    
-    const bearer = 'Bearer ' + localStorage.getItem('jwttoken');
 
-    return fetch( baseURL + 'users/checkjwttoken', {
-        method: "GET",
-        headers: {
-            'Authorization': bearer
-        },
-        credentials: "same-origin"                  
-    })
-    .then( response => {
-        if( response.ok )
-            return response;
+    auth.onAuthStateChanged( user => {
+        if (user) {
+            dispatch( receiveLogin(user) );
+            dispatch( fetchFavorites() );
+        } 
         else {
-            var error = new Error('Error ' + response.status + ': ' + response.statusText );
-            error.response = response;
-            throw error;
+            console.log('No User is logged in ! \n Please log in again.');
+            dispatch( loginError() );
         }
-    }, error => { throw error; })
-
-    .then( response => response.json() )
-    .then( response => {
-        if( response.success ) {
-
-            localStorage.setItem('usercreds', JSON.stringify( response.user.username ));         // check session storage
-            
-            // Dispatch the success action
-            dispatch( userChecked( response.user ) );
-            // dispatch( fetchFavorites() );
-            
-        }   
-        else {
-            var error = new Error('Error ' + response.status);
-            error.response = response;
-            throw error;
-        }
-    })
-    .catch( error => dispatch( loginError( error.message ) ) );
+      });
 };
 
 export const googleLogin = () => dispatch => {
@@ -391,7 +327,7 @@ export const googleLogin = () => dispatch => {
         .then( result => {
             var user = result.user;
             console.log('auth.currentUser: ', auth.currentUser, '\n user: ', user);
-            localStorage.setItem('user', JSON.stringify(user));
+            localStorage.setItem('user', JSON.stringify(user.email));
         
             dispatch(fetchFavorites());
             dispatch(receiveLogin(user));

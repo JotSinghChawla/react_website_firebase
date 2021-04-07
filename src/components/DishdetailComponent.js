@@ -8,13 +8,14 @@ import { FadeTransform, Fade, Stagger } from 'react-animation-components'
 
 const DishdetailComponent = ({ sentDish, postComment, isLoading, errMess, favorites, postFavorites }) => {
 
+    console.log( favorites )
     // This is a functional component
     const RenderDish = ({ dish, fav, postFav }) => {                  
         return dish !== null ?
                 <FadeTransform in transformProps={{
                     exitTransform: 'scale(0.5) translateY(-50%) '}} >
                     <Card>
-                        <CardImg width="100%" top src={baseURL + dish.image} alt={dish.name} />
+                        <CardImg width="100%" top src={dish.image} alt={dish.name} />
                         <CardImgOverlay>
                             <Button outline color="info" onClick={() => fav.length !== 0 ? console.log('Already favorite') : postFav(dish._id)}>
                                 { fav.length !== 0 ? <span className='fa fa-heart'></span> : <span className='fa fa-heart-o'></span> }
@@ -31,6 +32,7 @@ const DishdetailComponent = ({ sentDish, postComment, isLoading, errMess, favori
 
     // This is a functional component
     const ShowComments = ({ comments, postComment, dishId }) => {
+
         return comments !== null ? <>
             <h3>Comments</h3>
                 <ul className='list-unstyled'>
@@ -41,7 +43,7 @@ const DishdetailComponent = ({ sentDish, postComment, isLoading, errMess, favori
                                 <li>
                                     <p> {element.comment} </p>
                                     <p> {element.rating} stars</p>
-                                    <p>  -- {element.author.firstname + ' ' + element.author.lastname} | {new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: '2-digit'}).format(new Date(Date.parse( element.updatedAt )) )} </p>
+                                    <p>  -- {element.user.displayName} | {new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: '2-digit'}).format(new Date(Date.parse( new Date(element.updatedAt.seconds * 1000) ) ) )} </p>           
                                 </li>
                             </Fade>
                                 ) 
@@ -58,7 +60,7 @@ const DishdetailComponent = ({ sentDish, postComment, isLoading, errMess, favori
     }
 
     const inputDish = sentDish.length !== 0 ? sentDish[0] : null ;  
-    const inputComments = inputDish.comments;
+    const inputComments = inputDish ? inputDish.comments ? inputDish.comments: null : null;
 
     if(isLoading) {
         return(

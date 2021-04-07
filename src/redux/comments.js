@@ -2,19 +2,16 @@
 import * as ActionTypes from './ActionTypes'
 
 export const Comments = (state = {
-    errMess: null,
-    comments: []
+    isLoading: false,
+    errorMessage: null
 }, action) => {
     switch (action.type) {
-        case ActionTypes.ADD_COMMENTS:
-            return { ...state, isLoading: false, errorMessage: null, comments: action.payload}
+        case ActionTypes.POSTING_COMMENTS:
+            return { ...state, isLoading: true, errorMessage: null}
 
         case ActionTypes.COMMENTS_FAILED:
-            return { ...state, isLoading: false, errorMessage: action.payload, comments: []}
-
-        case ActionTypes.ADD_COMMENT:  
-            var comment = action.payload
-            return {...state, comments: state.comments.concat(comment)}
+            return { ...state, isLoading: false, errorMessage: action.message}
+            
         default:
             return state
     }
