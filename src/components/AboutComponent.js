@@ -10,8 +10,8 @@ const AboutComponent = ({ leaders }) => {
         return (
             <Fade in>
                 <Media key={input._id} className='mt-4'>
-                    <Media left middle>
-                        <Media object className='mr-5' src={input.image} alt={input.name} />
+                    <Media left middle className='pt-2'>
+                        <Media object className='mr-4' src={input.image} height='125' width='125' alt={input.name} />
                     </Media>
                     <Media body>
                         <Media heading>
@@ -80,7 +80,7 @@ const AboutComponent = ({ leaders }) => {
                     <h2>Corporate Leadership</h2>
                 </div>
                 <div className="col-12">
-                    <Media list>
+                    <Media list className='p-0'>
                         <Stagger in>
                             { leaders.map( (leader) => <RenderLeader input={leader}/> )}
                         </Stagger>

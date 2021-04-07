@@ -54,22 +54,24 @@ class ContactComponent extends Component {
                     <div className="col-12 col-sm-4 offset-sm-1">
                             <h5>Our Address</h5>
                             <address>
-                            121, Clear Water Bay Road<br />
-                            Clear Water Bay, Kowloon<br />
-                            HONG KONG<br />
-                            <i className="fa fa-phone"></i>: +852 1234 5678<br />
-                            <i className="fa fa-fax"></i>: +852 8765 4321<br />
-                            <i className="fa fa-envelope"></i>: <a href="mailto:confusion@food.net">confusion@food.net</a>
+                            121, Random Road<br />
+                            Hansi, Haryana<br />
+                            INDIA<br />
+                            <i className="fa fa-phone"></i>: +91 70153520xx<br />
+                            <i className="fa fa-fax"></i>: +91 12345678xx<br />
+                            <i className="fa fa-envelope"></i>: <a href="mailto:jot.chawla.54.js@gmail.com">jot.chawla.54.js@gmail.com</a>
                             </address>
                     </div>
                     <div className="col-12 col-sm-6 offset-sm-1">
-                        <h5>Map of our Location</h5>
+                        <h5>Map to find us</h5>
+                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2153.097558656621!2d75.96414026604138!3d29.095196591207465!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x5b88bf9b9e5f5494!2sHansi%20Bus%20stand!5e0!3m2!1sen!2sin!4v1617823531989!5m2!1sen!2sin" width="315" height="300" style={{ border:0 }} allowfullscreen="" loading="lazy"></iframe>
+                        <br />
                     </div>
                     <div className="col-12 col-sm-11 offset-sm-1">
                         <div className="btn-group" role="group">
-                            <a role="button" className="btn btn-primary" href="tel:+85212345678"><i className="fa fa-phone"></i> Call</a>
+                            <a role="button" className="btn btn-primary" href="tel:+917015352090)"><i className="fa fa-phone"></i> Call</a>
                             <a role="button" className="btn btn-info" href="https://www.skype.com/en/"><i className="fa fa-skype"></i> Skype</a>
-                            <a role="button" className="btn btn-success" href="mailto:confusion@food.net"><i className="fa fa-envelope-o"></i> Email</a>
+                            <a role="button" className="btn btn-success" href="mailto:jot.chawla.54.js@gmail.com"><i className="fa fa-envelope-o"></i> Email</a>
                         </div>
                     </div>
                 </div>

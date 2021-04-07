@@ -18,23 +18,22 @@ const FooterComponent = () => {
                 <div className="col-7 col-sm-5">
                     <h5>Our Address</h5>
                     <address>
-		              121, Clear Water Bay Road<br />
-		              Clear Water Bay, Kowloon<br />
-		              HONG KONG<br />
-		              <i className="fa fa-phone fa-lg"></i>: +852 1234 5678<br />
-		              <i className="fa fa-fax fa-lg"></i>: +852 8765 4321<br />
-		              <i className="fa fa-envelope fa-lg"></i>: <a href="mailto:confusion@food.net">
-                         confusion@food.net</a>
+                    121, Random Road<br />
+                    Hansi, Haryana<br />
+                    INDIA<br />
+                    <i className="fa fa-phone"></i>: +91 70153520xx<br />
+                    <i className="fa fa-fax"></i>: +91 12345678xx<br />
+                    <i className="fa fa-envelope"></i>: <a href="mailto:jot.chawla.54.js@gmail.com">jot.chawla.54.js@gmail.com</a>
                     </address>
                 </div>
                 <div className="col-12 col-sm-4 align-self-center">
                     <div className="text-center">
                         <a className="btn btn-social-icon btn-google" href="http://google.com/+"><i className="fa fa-google-plus"></i></a>
                         <a className="btn btn-social-icon btn-facebook" href="http://www.facebook.com/profile.php?id="><i className="fa fa-facebook"></i></a>
-                        <a className="btn btn-social-icon btn-linkedin" href="http://www.linkedin.com/in/"><i className="fa fa-linkedin"></i></a>
+                        <a className="btn btn-social-icon btn-linkedin" href="https://www.linkedin.com/in/jot-singh-chawla-708846138/"><i className="fa fa-linkedin"></i></a>
                         <a className="btn btn-social-icon btn-twitter" href="http://twitter.com/"><i className="fa fa-twitter"></i></a>
                         <a className="btn btn-social-icon btn-google" href="http://youtube.com/"><i className="fa fa-youtube"></i></a>
-                        <a className="btn btn-social-icon" href="mailto:"><i className="fa fa-envelope-o"></i></a>
+                        <a className="btn btn-social-icon" href="mailto:jot.chawla.54.js@gmail.com"><i className="fa fa-envelope-o"></i></a>
                     </div>
                 </div>
             </div>
