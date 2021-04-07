@@ -1,10 +1,74 @@
 import * as ActionTypes from './ActionTypes'
-import { baseURL } from '../shared/baseURL'
+import { baseURL } from '../shared/baseURL'          // No need as we are using Firebase
+import { auth, firestore, fireauth, firebasestore } from '../firebase/firebase'
 
-export const addComment = ( comment ) => ({
-        type: ActionTypes.ADD_COMMENT,
-        payload: comment
+export const addDishes = (dishes) => ({
+    type: ActionTypes.ADD_DISHES,
+    payload: dishes
 })
+
+export const dishesLoading = () => ({
+    type: ActionTypes.DISHES_LOADING
+})
+
+export const dishesFailed = (errorMessage) => ({
+    type: ActionTypes.DISHES_FAILED,
+    payload: errorMessage
+})
+
+export const fetchDishes = () => (dispatch) => {
+    dispatch(dishesLoading(true))
+
+    return firestore.collection('dishes').get()
+        .then( querySnapshot => {
+            let dishes = [];
+            querySnapshot.forEach( doc => {
+                const data = doc.data();                    // Data and Id are separately received
+                const _id = doc.id;
+                dishes.push({ _id, ...data });              // what is the use of ... Spread operator here ?    
+                                        // Adding {} is important to make it whole an object to work with Spread operator
+            });
+            return dishes;
+        })
+        .then( dishes => dispatch( addDishes(dishes) ) )
+        .catch( error => dispatch( dishesFailed(error.message) ) );
+}
+
+// export const addComment = ( comment ) => ({              // No need it as comment will be added through Dish
+//     type: ActionTypes.ADD_COMMENT,
+//     payload: comment
+// })
+
+// export const addComments = (comments) => ({
+//     type: ActionTypes.ADD_COMMENTS,
+//     payload: comments
+// })
+
+export const commentsFailed = (errorMessage) => ({
+    type: ActionTypes.COMMENTS_FAILED,
+    payload: errorMessage
+})
+
+
+// export const fetchComments = () => (dispatch) => {
+//     return fetch( baseURL + 'comments' )
+//         .then( response => {
+//             if( response.ok ) {
+//                 return response
+//             }
+//             else {
+//                 var error = new Error( 'Error '+ response.status + ': ' + response.statusText )
+//                 error.response = response
+//                 throw error
+//             }
+//         }, error => {
+//             var errMess = new Error( error.message )
+//             throw errMess
+//         })
+//         .then( response => response.json() )
+//         .then( comments => dispatch( addComments(comments) ))
+//         .catch( error => { dispatch( commentsFailed( error.message  ) ) } )
+// }
 
 export const postComment = ( dishId, rating, comment ) => (dispatch) => {
     const newComment = {
@@ -46,98 +110,6 @@ export const postComment = ( dishId, rating, comment ) => (dispatch) => {
     dispatch( fetchDishes() );
 }
 
-export const fetchDishes = () => (dispatch) => {
-    dispatch(dishesLoading(true))
-
-    return fetch(baseURL + 'dishes')
-        .then( response => {
-            if( response.ok ) {
-                return response
-            }
-            else {
-                var error = new Error( 'Error ' + response.status + ': ' + response.statusText )
-                error.response = response
-                throw error
-            }
-        }, error => {
-           var errMess = new Error( error.message )
-           throw errMess 
-        })
-        .then( response => response.json() )
-        .then( dishes => dispatch( addDishes(dishes) ) )
-        .catch( error => dispatch( dishesFailed(error.message) ) )
-    // setTimeout( () => {
-    //     dispatch(addDishes(DISHES))
-    // }, 2000 )
-}
-
-export const addDishes = (dishes) => ({
-    type: ActionTypes.ADD_DISHES,
-    payload: dishes
-})
-
-export const dishesLoading = () => ({
-    type: ActionTypes.DISHES_LOADING
-})
-
-export const dishesFailed = (errorMessage) => ({
-    type: ActionTypes.DISHES_FAILED,
-    payload: errorMessage
-})
-
-export const fetchComments = () => (dispatch) => {
-    return fetch( baseURL + 'comments' )
-        .then( response => {
-            if( response.ok ) {
-                return response
-            }
-            else {
-                var error = new Error( 'Error '+ response.status + ': ' + response.statusText )
-                error.response = response
-                throw error
-            }
-        }, error => {
-            var errMess = new Error( error.message )
-            throw errMess
-        })
-        .then( response => response.json() )
-        .then( comments => dispatch(addComments(comments) ))
-        .catch( error => { dispatch( commentsFailed( error.message  ) ) } )
-}
-
-export const addComments = (comments) => ({
-    type: ActionTypes.ADD_COMMENTS,
-    payload: comments
-})
-
-export const commentsFailed = (errorMessage) => ({
-    type: ActionTypes.COMMENTS_FAILED,
-    payload: errorMessage
-})
-
-
-export const fetchPromos = () => (dispatch) => {
-    dispatch(promosLoading(true))
-
-    return fetch(baseURL + 'promotions')
-        .then( response => {
-            if( response.ok ) {
-                return response
-            }
-            else {
-                var error = new Error( 'Error '+ response.status + ': ' + response.statusText )
-                error.response = response
-                throw error
-            }
-        }, error => {
-            var errMess = new Error( error.message )
-            throw errMess
-        })
-        .then( response => response.json() )
-        .then( promotions => dispatch( addPromos(promotions) ) )
-        .catch( error => dispatch( promosFailed(error.message) ) )
-}
-
 export const addPromos = (promos) => ({
     type: ActionTypes.ADD_PROMOS,
     payload: promos
@@ -151,6 +123,23 @@ export const promosFailed = (errorMessage) => ({
     type: ActionTypes.PROMOS_FAILED,
     payload: errorMessage
 })
+
+export const fetchPromos = () => (dispatch) => {
+    dispatch(promosLoading(true))
+
+    return firestore.collection('promotions').get()
+        .then( snapshot => {
+            let promos = [];
+            snapshot.forEach( doc => {
+                const data = doc.data();
+                const _id = doc.id;
+                promos.push({ _id, ...data });
+            });
+            return promos;
+        })
+        .then( promotions => dispatch( addPromos(promotions) ) )
+        .catch( error => dispatch( promosFailed(error.message) ) )
+}
 
 export const addLeaders = (leaders) => ({
     type: ActionTypes.ADD_LEADERS,
@@ -169,61 +158,36 @@ export const leadersFailed = ( errorMessage ) => ({
 export const fetchLeaders = () => (dispatch) => {
     dispatch(leadersLoading(true))
 
-    return fetch( baseURL + 'leaders')
-        .then( response => {
-            if( response.ok ) {
-                return response
-            }
-            else {
-                var error = new Error( 'Error ' + response.status + ': ' + response.statusText )
-                error.response = response
-                throw error
-            }
-        }, error => {
-            var errMess = new Error( error.message )
-            throw errMess
+    return firestore.collection('leaders').get()
+        .then( snapshot => {
+            let promos = [];
+            snapshot.forEach( doc => {
+                const data = doc.data();
+                const _id = doc.id;
+                promos.push({ _id, ...data });
+            });
+            return promos;
         })
-        .then( response => response.json() )
         .then( leaders => dispatch( addLeaders(leaders) ) )
         .catch( error => dispatch( leadersFailed(error.message) ) )    // If you write error only the code will Crash !!
 }
 
-export const postFeedback = ( firstname, lastname, email, telnum, 
-                            agree, contactType ,message) => () => {
-                const newFeedback = {
-                    firstname: firstname,
-                    lastname: lastname,
-                    email: email,
-                    telnum: telnum,
-                    agree: agree,
-                    contactType: contactType,
-                    message: message
-                }
+export const postFeedback = ( firstname, lastname, email, telnum, agree, contactType ,message) => () => {
+        const newFeedback = {
+            firstname: firstname,
+            lastname: lastname,
+            email: email,
+            telnum: parseInt(telnum),
+            agree: agree,
+            contactType: contactType,
+            message: message
+        }
+        console.log({ createdAt: firebasestore.FieldValue.serverTimestamp(), ...newFeedback })
 
-        return fetch( baseURL + 'feedback' , {
-            method: 'POST',
-            body: JSON.stringify( newFeedback ),
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            credentials: 'same-origin'
-        })
-        .then( response => {
-            if(response.ok)
-                return response
-            else {
-                var error = new Error('Error ' + response.status + ': ' + response.statusText )
-                error.response = response
-                throw error
-            }
-        }, error => {
-            var errMess = new Error( error.message )
-            throw errMess
-        })
-        .then( response => response.json() )
+        return firestore.collection('feedback').add({ createdAt: firebasestore.FieldValue.serverTimestamp(), ...newFeedback })
         .then( response => { 
             console.log('Current State is: ' , response)
-            alert('Thank you for your feedback!\n' + JSON.stringify(response) ) 
+            alert('Thank you for your feedback!\n ID Generated is: ' + response.id ) 
         })
         .catch( error => {
             console.log( 'POST FEEDBACK: ', error.message )
@@ -246,99 +210,85 @@ export const addFavorites = favorite => ({
 });
 
 export const fetchFavorites = () => dispatch => {
+
+    if( !auth.currentUser ) {
+        console.log( 'No User logged in! \n Can\'t display any Favorites');
+        return;
+    }
+    var user = auth.currentUser;
+
     dispatch( favoritesLoading(true) );
 
-    const bearer = 'Bearer ' + localStorage.getItem('jwttoken');
-
-    return fetch( baseURL  + 'favorites', {
-        method: "GET",
-        headers: {
-            'Authorization': bearer
-        },
-        credentials: "same-origin"
-    })
-    .then( response => {
-        if( response.ok ) 
-            return response;
-        else {
-            var error = new Error('Error ' + response.status + ': ' + response.statusText );
-            error.response = response;
-            throw error; 
-        }
-    }, error => {
-        var errmess = new Error( error.message );
-        throw errmess;
-    }) 
-    .then( response => response.json() )
-    .then( favorites => dispatch( addFavorites(favorites) ) )                 // Adding Favorites to Redux Store
-    .catch( error => dispatch( favoritesFailed( error.message ) ) );
+    return firestore.collection('favorites').where( 'user', '==', user.uid ).get()
+        .then( querySnapshot => {
+            let favorites = { user: user, dishes: [] };
+            querySnapshot.forEach( doc => {
+                const data = doc.data();
+                favorites.dishes.push( data.dish );
+            })
+            console.log( favorites )
+            return favorites; 
+        })    
+        .then( favorites => dispatch( addFavorites(favorites) ) )                 // Adding Favorites to Redux Store
+        .catch( error => dispatch( favoritesFailed( error.message ) ) );
 };
 
 export const postFavorites = (dishId) => (dispatch) => {
     
-    const bearer = 'Bearer ' + localStorage.getItem('jwttoken');
+    if( !auth.currentUser ) {
+        console.log( 'No User logged in! \n Can\'t post any Favorites');
+        return;
+    }
 
-    return fetch(baseURL + 'favorites/' + dishId, {
-        method: "POST",
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': bearer
-        },
-        credentials: "same-origin"
-    })
-    .then( response => {
-        if( response.ok )
-            return response;
-        else {
-            var error = new Error('Error ' + response.status + ': ' + response.statusText);
-            error.response = response;
-            throw error;
-        }
-    }, error => { throw error })
-    .then( response => response.json() )
-    .then( favorites => {
-        console.log('Dish added to Favorites: ', favorites);
-        dispatch( addFavorites( favorites ) );                          // Adding Favorites to Redux Store
-    })
-    .catch( error => dispatch( favoritesFailed( error.message ) ) );
+    return firestore.collection('favorites').add({
+            user: auth.currentUser.uid,
+            dish: dishId    
+        })
+        .then( docRef => {
+            firestore.collection('favorites').doc( docRef ).get()
+                .then( doc => {
+                    if( doc.exists ) {
+                        dispatch( fetchFavorites() );
+                    }
+                    else {
+                        // doc.data() will be undefined in this case
+                        console.log("No such document!");
+                    }
+                })  
+        })
+        .catch( error => dispatch( favoritesFailed( error.message ) ) );
 };
 
 export const deleteFavorites = dishId => dispatch => {
-    
-    const bearer = 'Bearer ' + localStorage.getItem('jwttoken');
-    
-    return fetch( baseURL  + 'favorites/' + dishId, {
-        method: "DELETE",
-        headers: {
-            'Authorization': bearer
-        },
-        credentials: "same-origin"
-    })
-    .then( response => {
-        if( response.ok )
-            return response;
-        else {
-            var error = new Error('Error ' + response.status + ': ' + response.statusText);
-            error.response = response;
-            throw error;       
-        }
-    }, errmess => { throw errmess })
-    .then( response => response.json() )
-    .then( favorites => {
-        console.log('Favorites Deleted: ', favorites);
-        dispatch( addFavorites(favorites) );                          // Adding Favorites to Redux Store
-    })
-    .catch( error => dispatch( favoritesFailed( error.message ) ) ); 
+
+    if( !auth.currentUser ) {
+        console.log( 'No User logged in! \n Can\'t delete any Favorites');
+        return;
+    }
+    var user = auth.currentUser;
+
+    return firestore.collection('favorites').where( 'user', '==', user.uid ).where( 'dish', '==', dishId ).get()
+        .then( snapshot => {
+            console.log( snapshot )
+            snapshot.forEach( doc => {
+                console.log( doc.id );
+                firestore.collection('favorites').doc( doc.id ).delete()
+                    .then( () => {
+                        dispatch( fetchFavorites() );
+                    })
+                    .catch( error => console.log( error.message ) ); 
+            })
+        }) 
+        .catch( error => dispatch( favoritesFailed( error.message ) ) ); 
 };
 
-export const requestLogin = creds => ({
-    type: ActionTypes.LOGIN_REQUEST,
-    payload: creds.username                       
+export const requestLogin = () => ({
+    type: ActionTypes.LOGIN_REQUEST            
 });
 
-export const receiveLogin = response => ({
+export const receiveLogin = user => ({
     type: ActionTypes.LOGIN_SUCCESS,
-    token: response.token                   // try payload: response.token
+    payload: user                               // try payload: response.token
 });
 
 export const loginError = message => ({
@@ -350,46 +300,15 @@ export const loginError = message => ({
 export const loginUser = creds => dispatch => {    
     // We dispatch requestLogin to kickoff the call to the API
     dispatch( requestLogin(creds) );
-
-    return fetch( baseURL + 'users/login', {
-        method: "POST",
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify( creds )                   // These creds are passed in loginUser() function 
-    })
-    .then( response => {
-        if( response.ok )
-            return response;
-        else {
-            var error = new Error('Error ' + response.status + ': ' + response.statusText );
-            error.response = response;
-            throw error;
-        }
-    }, error => { throw error; })
-    // error => {
-    //     var errmess = new Error( error.message );
-    //     throw errmess;
-    // }) 
-    .then( response => response.json() )
-    .then( response => {
-        if( response.success ) {
-            // If login was successful, set the token in local storage
-            localStorage.setItem('jwttoken', response.token );
-            localStorage.setItem('usercreds', JSON.stringify( creds.username ));         // check session storage
-            
-            // Dispatch the success action
-            dispatch( receiveLogin( response ) );
+    return auth.signInWithEmailAndPassword( creds.username, creds.password )
+        .then( () => {
+            var user = auth.currentUser;
+            localStorage.setItem('user', JSON.stringify(user.email) );
+                 
             dispatch( fetchFavorites() );
-            
-        }   
-        else {
-            var error = new Error('Error ' + response.status);
-            error.response = response;
-            throw error;
-        }
-    })
-    .catch( error => dispatch( loginError( error.message ) ) );
+            dispatch( receiveLogin(user) );
+        })
+        .catch( error => dispatch( loginError( error.message ) ) );
 };
 
 export const requestLogout = () => ({
@@ -404,11 +323,14 @@ export const receiveLogout = () => ({
 export const logoutUser = () => (dispatch) => {
     dispatch( requestLogout() );
 
-    localStorage.removeItem('jwttoken');
-    localStorage.removeItem('usercreds');
-
-    dispatch( favoritesFailed("Error 401: Unauthorized") );
-    dispatch( receiveLogout() );
+    return auth.signOut()
+    .then( () => {
+        localStorage.removeItem('user');
+    
+        dispatch( favoritesFailed("Error 401: Unauthorized") );
+        dispatch( receiveLogout() );
+    }) 
+    .catch( error => dispatch( loginError( error.message ) ) );
 };
 
 export const checkingUser = () => ({
@@ -460,4 +382,19 @@ export const checkUser = () => (dispatch) => {
         }
     })
     .catch( error => dispatch( loginError( error.message ) ) );
+};
+
+export const googleLogin = () => dispatch => {
+    const provider = new fireauth.GoogleAuthProvider();
+
+    auth.signInWithPopup( provider )
+        .then( result => {
+            var user = result.user;
+            console.log('auth.currentUser: ', auth.currentUser, '\n user: ', user);
+            localStorage.setItem('user', JSON.stringify(user));
+        
+            dispatch(fetchFavorites());
+            dispatch(receiveLogin(user));
+        })
+        .catch( error => dispatch( loginError( error.message ) ) );
 };

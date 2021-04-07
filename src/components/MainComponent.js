@@ -9,7 +9,7 @@ import Contact from './ContactComponent'
 import Favorites from './FavoriteComponent'
 import { Switch, Route, Redirect, withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { postComment, fetchComments, fetchDishes, fetchPromos, fetchLeaders, postFeedback, fetchFavorites, postFavorites, deleteFavorites, loginUser, logoutUser, checkUser } from '../redux/ActionCreators'
+import { postComment, fetchComments, fetchDishes, fetchPromos, fetchLeaders, postFeedback, fetchFavorites, postFavorites, deleteFavorites, loginUser, logoutUser, checkUser, googleLogin } from '../redux/ActionCreators'
 import { actions } from 'react-redux-form'              // For Reseting the Feedback Form 
 import { TransitionGroup, CSSTransition } from 'react-transition-group'
 
@@ -35,13 +35,14 @@ const mapDispatchToProps = (dispatch) => ({
   deleteFavorites: dishId => dispatch(deleteFavorites(dishId) ),
   loginUser: creds => dispatch( loginUser(creds) ),
   logoutUser: () => dispatch( logoutUser() ),
-  checkUser: () => dispatch( checkUser() )
+  checkUser: () => dispatch( checkUser() ),
+  googleLogin: () => dispatch( googleLogin() )
 })
 
 class Main extends Component {
   
   componentDidMount() {
-    this.props.checkUser()
+    // this.props.checkUser()
     this.props.fetchFavorites()
     this.props.fetchDishes()      // this function is called
     this.props.fetchPromos()  
@@ -104,7 +105,9 @@ class Main extends Component {
       <div >
        <Header loginUser={ this.props.loginUser }
                logoutUser={ this.props.logoutUser } 
-               auth={ this.props.auth } />
+               auth={ this.props.auth } 
+               googleLogin={ this.props.googleLogin }
+               />
         <TransitionGroup>
           <CSSTransition key={this.props.location.pathname} classNames='page' timeout={300}>   
              {/*  Here it is ClassNameS <-- in Csstransition component to apply to all children */}
