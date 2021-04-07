@@ -81,36 +81,39 @@ const DishdetailComponent = ({ sentDish, postComment, isLoading, errMess, favori
         )
     }
 
-    else 
+    else if( inputDish )
     {
-    return ( 
-        <div className='container'>
-            <div className='row'>
-                <Breadcrumb>
-                    <BreadcrumbItem> 
-                        <Link to='/menu'>Menu</Link>
-                    </BreadcrumbItem>
-                    <BreadcrumbItem active> 
-                        { inputDish.name }
-                    </BreadcrumbItem>
-                </Breadcrumb>
-                <div className="col-12">
-                            <h2>{inputDish.name}</h2>
-                            <hr />
-                        </div>
-            </div>
-            <div className='row'>
-                <div className="col-12 col-md-5 m-2" >
-                    <RenderDish dish={ inputDish } fav={ favorites } postFav={ postFavorites } />
+        return ( 
+            <div className='container'>
+                <div className='row'>
+                    <Breadcrumb>
+                        <BreadcrumbItem> 
+                            <Link to='/menu'>Menu</Link>
+                        </BreadcrumbItem>
+                        <BreadcrumbItem active> 
+                            { inputDish.name }
+                        </BreadcrumbItem>
+                    </Breadcrumb>
+                    <div className="col-12">
+                                <h2>{inputDish.name}</h2>
+                                <hr />
+                            </div>
                 </div>
-                <div className="col-12 col-md-5 m-2" >
-                    <ul className='list-unstyled'>
-                        <ShowComments comments={ inputComments } postComment={ postComment } dishId={ inputDish._id } />
-                    </ul>
+                <div className='row'>
+                    <div className="col-12 col-md-5 m-2" >
+                        <RenderDish dish={ inputDish } fav={ favorites } postFav={ postFavorites } />
+                    </div>
+                    <div className="col-12 col-md-5 m-2" >
+                        <ul className='list-unstyled'>
+                            <ShowComments comments={ inputComments } postComment={ postComment } dishId={ inputDish._id } />
+                        </ul>
+                    </div>
                 </div>
-            </div>
-        </div> 
-    )
+            </div> 
+        )
+    }
+    else {
+        // We don't need this statement
     }
    
     

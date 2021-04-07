@@ -67,7 +67,7 @@ class Main extends Component {
     // Here match is a prop which is part of Route component just like history & location
     const DishWithId = ({ match }) => {
       return (
-         this.props.auth.isAuthenticated  ? 
+         this.props.auth.isAuthenticated && !this.props.favorites.isLoading && !this.props.favorites.errMessage? 
             <DishdetailComponent sentDish={ this.props.dishes.dishes.filter( dish => dish._id === (match.params.dishId) )}
               isLoading={ this.props.dishes.isLoading }
               errMess={this.props.dishes.errorMessage } 

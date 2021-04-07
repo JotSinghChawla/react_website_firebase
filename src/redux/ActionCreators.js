@@ -34,12 +34,12 @@ export const fetchDishes = () => (dispatch) => {
         .catch( error => dispatch( dishesFailed(error.message) ) );
 }
 
-export const commentsFailed = (errorMessage) => ({
+export const commentFailed = (errorMessage) => ({
     type: ActionTypes.COMMENTS_FAILED,
     message: errorMessage
 })
 
-export const postingComments = () => ({
+export const postingComment = () => ({
     type: ActionTypes.POSTING_COMMENTS
 })
 
@@ -52,7 +52,7 @@ export const postComment = ( dishId, rating, comment ) => (dispatch) => {
     }
     var currentUser = auth.currentUser;
 
-    dispatch( favoritesLoading(true) );
+    dispatch( postingComment() );
 
     
     const newComment = {
@@ -70,16 +70,13 @@ export const postComment = ( dishId, rating, comment ) => (dispatch) => {
     return firestore.collection('dishes').doc( dishId ).update({
         comments: firebasestore.FieldValue.arrayUnion({ updatedAt: firebasestore.Timestamp.now(), ...newComment })
         })
-        .then((docRef) => {
-            console.log("Document written with DATA: ", docRef);
-            // console.log("Document written with ID: ", docRef.id);
-        })
         .then( () => {
             dispatch( fetchDishes() );
         })
         .catch( error => { 
             console.log( 'POST COMMENTS: ', error.message )
             alert( 'Your comment is not posted\nError: ',error.message )
+            dispatch( commentFailed(error.message) );
         });
 }
 
@@ -190,7 +187,7 @@ export const fetchFavorites = () => dispatch => {
     }
     var user = auth.currentUser;
 
-    dispatch( favoritesLoading(true) );
+    dispatch( favoritesLoading() );
 
     return firestore.collection('favorites').where( 'user', '==', user.uid ).get()
         .then( querySnapshot => {
@@ -218,16 +215,8 @@ export const postFavorites = (dishId) => (dispatch) => {
             dish: dishId    
         })
         .then( docRef => {
-            firestore.collection('favorites').doc( docRef ).get()
-                .then( doc => {
-                    if( doc.exists ) {
-                        dispatch( fetchFavorites() );
-                    }
-                    else {
-                        // doc.data() will be undefined in this case
-                        console.log("No such document!");
-                    }
-                })  
+            console.log( 'Favorite created with ID: ', docRef.id)
+            dispatch( fetchFavorites() );
         })
         .catch( error => dispatch( favoritesFailed( error.message ) ) );
 };
@@ -300,7 +289,7 @@ export const logoutUser = () => (dispatch) => {
     .then( () => {
         localStorage.removeItem('user');
     
-        dispatch( favoritesFailed("Error 401: Unauthorized") );
+        dispatch( favoritesFailed("User Logged Out: Can't fetch favorites") );
         dispatch( receiveLogout() );
     }) 
     .catch( error => dispatch( loginError( error.message ) ) );
